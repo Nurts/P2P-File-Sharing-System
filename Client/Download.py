@@ -1,7 +1,7 @@
 
 import socket
 
-def download(req_file):
+def download_handler(req_file):
     print(req_file)
 
     ip = req_file["ip"]
@@ -10,7 +10,8 @@ def download(req_file):
     peer = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         peer.connect((ip, port))
-    except socket.error:
+    except socket.error as e:
+        print(e)
         peer.close()
         return 0, "Failed to connect to the Peer!"
     
@@ -19,8 +20,8 @@ def download(req_file):
     peer.send(request_message.encode())
 
     buffer = peer.recv(4096)
-
-    if(buffer[:5] != "FILE: "):
+    print(buffer[:6].decode("utf-8"))
+    if(buffer[:6].decode("utf-8") != "FILE: "):
         peer.close()
         return 0, "Peer is not responding correctly !"
 
@@ -29,9 +30,15 @@ def download(req_file):
     while(len(buffer) < req_file["size"]):
         buffer += peer.recv(4096)
     
-    # filename = req_file["dir"] + "/" + req_file["name"] + "." + req_file["type"]
-    # out_file = open(filename, "wb")
-    # out_file.write()
+    filename = req_file["dir"] + "/" + req_file["name"] + "." + req_file["type"]
+    out_file = open(filename, "wb")
+    out_file.write(buffer)
+    out_file.close()
+
+    peer.close()
+
+    return 1, "File was downloaded successfully !"
+
 
 
     
