@@ -1,11 +1,22 @@
 import tkinter as tk
+import tkinter.messagebox
 from Listener import Listener
 from Widgets import PlaceholderEntry
 from Widgets import FocusButton
 from Download import download_handler
+from Sender import Sender
 import multiprocessing
 import sys
-# <pdf, 258, 07/30/2018, 192.168.0.5, 7777>
+import json
+
+# Configure this values
+host = "localhost"
+downloads_folder = "../Downloads"
+share_folder = "../Files"
+#Server Ip and port should be here
+ft_server = "1.1.1.1" , 1111
+
+
 
 class ClientApp(tk.Tk):
     def __init__(self, download_dir, source_dir):
@@ -40,24 +51,46 @@ class ClientApp(tk.Tk):
         self.status_text.pack(side = tk.LEFT, pady = 20, padx = 20)
 
         #Start listener
-        self.listener = Listener("localhost", source_dir)
-        print("Running On: {}".format(self.listener.get_self()))
+        global host
+        self.listener = Listener(host, source_dir)
+        self.host, self.port = self.listener.get_self()
+
+        print("Running On: {}:{}".format(self.host, self.port))
+
         self.listen_thread = multiprocessing.Process(target=self.listener.listen)
         self.listen_thread.start()
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
+        #Start Sender
+        
+        self.sender = Sender(source_dir, self.host, self.port)
+        
+        global ft_server
+#Uncomment this if server is on
+        print("Connecting to Server...")
+        # status = self.sender.start_conn(ft_server[0], ft_server[1])
+        # if(status == 0):
+        #     tkinter.messagebox.showerror(title="Error", message="Couldn't connect to FT server!\nCheck the ip configuration in Client.py")
+
+
+# If server is not ready this will say "Could not connect to server"
     def search(self):
-        text = self.search_bar.get()
+        filename = self.search_bar.get().strip()
+        
+        succ, status_message = self.sender.search(filename)
 
+        if not succ:
+            self.status_text.configure(text = status_message, fg = "red")
 
-        for i in range(10):
-            self.listbox.insert(tk.END, text)
+        else:
+            for result in self.sender.get_results():
+                self.listbox.insert(tk.END, result)
 
         
 
     def download(self):
-        #<txt, 30, 07/30/2018, 127.0.0.1, 55038>
+        #<jpg, 54280, 07/30/2018, 127.0.0.1, 55682>
         data = self.listbox.get(tk.ACTIVE).strip()[1:-1].split(',')
         data = list(map(lambda str: str.strip(), data))
         status_message = "Nothing happened"
@@ -68,7 +101,7 @@ class ClientApp(tk.Tk):
             status_color = "red"
         else:
             req_file = {
-                "name" : "asd",#self.search_bar.get().strip()
+                "name" : "car_image",#self.search_bar.get().strip()
                 "type" : data[0],
                 "size" : int(data[1]),
                 "date" : data[2],
@@ -87,6 +120,8 @@ class ClientApp(tk.Tk):
     
     def on_closing(self):
         print("Closing!")
+        self.sender.close()
+
         self.listen_thread.terminate()
         sys.exit()
         
@@ -95,7 +130,8 @@ class ClientApp(tk.Tk):
 if __name__ == "__main__":
 
 
-    app = ClientApp("D:/Projects/P2P_File_Sharing/Downloads", "D:/Projects/P2P_File_Sharing/Files")
+
+    app = ClientApp(downloads_folder, share_folder)
     app.mainloop()
 
     
