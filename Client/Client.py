@@ -14,7 +14,7 @@ host = "localhost"
 downloads_folder = "../Downloads"
 share_folder = "../Files"
 #Server Ip and port should be here
-ft_server = "1.1.1.1" , 1111
+ft_server = "127.0.0.1" , 2558
 
 
 
@@ -69,9 +69,11 @@ class ClientApp(tk.Tk):
         global ft_server
 #Uncomment this if server is on
         print("Connecting to Server...")
-        # status = self.sender.start_conn(ft_server[0], ft_server[1])
-        # if(status == 0):
-        #     tkinter.messagebox.showerror(title="Error", message="Couldn't connect to FT server!\nCheck the ip configuration in Client.py")
+        print(ft_server[0])
+        print(ft_server[1])
+        status = self.sender.start_conn(ft_server[0], ft_server[1])
+        if(status == 0):
+            tkinter.messagebox.showerror(title="Error", message="Couldn't connect to FT server!\nCheck the ip configuration in Client.py")
 
 
 # If server is not ready this will say "Could not connect to server"

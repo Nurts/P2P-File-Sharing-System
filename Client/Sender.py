@@ -60,7 +60,7 @@ class Sender:
 
         for file_ in self.file_info:
 
-            if(len(message > 0)):
+            if(len(message) > 0):
                 message += self.separator
             
             message += file_
@@ -112,14 +112,5 @@ class Sender:
         
         
 
-
-
-
-
-        
-
-
-        
-
 if __name__ == "__main__":
-    sender = Sender("../Files", "0.0.0.0", 1232)
+    sender = Sender("../Files", "127.0.0.1", 2558)
