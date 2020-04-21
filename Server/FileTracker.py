@@ -91,7 +91,8 @@ def method(connection, address, incoming):
             output = "FOUND: "
             nodeList = hashMap.get(search)
             for node in nodeList:
-                output = output + str(node)
+                output = output + str(node) + "|"
+            output = output[0:len(output)-1]
             # byte_output = bytes(output, 'utf-8')
             # connection.send(byte_output)
             print(output)
