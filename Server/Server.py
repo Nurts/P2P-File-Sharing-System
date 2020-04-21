@@ -1,3 +1,5 @@
+#by Nurtas Ilyas and Askhat Kenenbay
+
 import os
 import signal
 import socket

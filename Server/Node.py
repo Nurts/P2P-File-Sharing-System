@@ -1,4 +1,4 @@
-
+#by Nurtas Ilyas and Askhat Kenenbay
 
 class Node:
     def __init__(self, fileType, fileSize, lastMod, ip, port, creator_ip, creator_port):

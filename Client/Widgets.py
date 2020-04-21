@@ -1,3 +1,4 @@
+#by Nurtas Ilyas and Askhat Kenenbay
 import tkinter as tk
 
 class FocusButton(tk.Button):

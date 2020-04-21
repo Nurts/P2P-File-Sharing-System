@@ -1,3 +1,4 @@
+#by Nurtas Ilyas and Askhat Kenenbay
 import socket
 import os
 from threading import Thread
