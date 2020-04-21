@@ -81,10 +81,10 @@ class Sender:
         
         self.server.send(message.encode())
         
-        buffer = self.server.recv(4096)
+        buffer = self.server.recv(4096).decode("utf-8")
         
         while "\0" not in buffer:
-            buffer += self.server.recv(4096)
+            buffer += self.server.recv(4096).decode("utf-8")
         
         buffer = buffer.decode("utf-8")
         
