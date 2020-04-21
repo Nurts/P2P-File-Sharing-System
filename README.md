@@ -1,9 +1,10 @@
 # P2P-File-Sharing-System
-P2P File sharing Application
-by Nurtas Ilyas and Askhat Kenenbay
+P2P File sharing Application by Nurtas Ilyas and Askhat Kenenbay
 
 Clients could search for file (only type filename without extension).
+
 Then Select the peer and press Download button to download file to your Download folder (specified in Client.py)
+
 By default dowload directory and sharing directory are Download and Files folders respectively
 
 Instructions:
