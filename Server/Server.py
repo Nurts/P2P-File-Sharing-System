@@ -140,7 +140,6 @@ def client_function(connection, address):
             close_connection = True
         if close_connection is True:
             connection.close()
-            sys.exit(0)
             break
 
 if __name__ == "__main__":
