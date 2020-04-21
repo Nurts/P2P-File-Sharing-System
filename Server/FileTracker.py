@@ -44,6 +44,7 @@ def method(connection, address, incoming):
             clients[address[0]] = address[1]
         print("Files send: ")
         print(count)
+        print(clients)
         print(hashMap)
         # we are not closing connection, need false
         return 1==0
@@ -59,13 +60,26 @@ def method(connection, address, incoming):
         connection.close()
         # remove from clients
         print("Closing connection with"+str(address))
+        print("before BYE:")
+        print(hashMap)
+        print(clients)
+        print("--------------------------")
         del clients[address[0]]
         # remove from hashMap
+        removeKey = []
         for key in hashMap:
             nodeList = hashMap.get(key)
             for node in nodeList:
                 if node.creator_ip == address[0] and  node.creator_port == address[1]:
                     nodeList.remove(node)
+                    if len(nodeList) ==0:
+                        removeKey.append(key)
+        for key in removeKey:
+            del hashMap[key]
+        print("after BYE:")
+        print(hashMap)
+        print(clients)
+        print("--------------------------")
         # we are closing connection, need true
         return 1==1
     search = message[0:6]
