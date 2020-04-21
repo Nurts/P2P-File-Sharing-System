@@ -45,7 +45,6 @@ class Listener:
         }
 
         peer_socket.send(b"FILE: ")
-
         if os.path.isfile(file_data["path"]):
 
             sfile = open(file_data["path"], "rb")
@@ -53,7 +52,8 @@ class Listener:
             while (len(buffer) > 0):
                 peer_socket.send(buffer)
                 buffer = sfile.read(2048)
-        print("Sent successfully!")
+            print("Sent successfully!")
+        
         peer_socket.close()
         
 

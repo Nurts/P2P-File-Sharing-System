@@ -1,6 +1,7 @@
 import socket
 import os
 import time
+import Helper
 
 class Sender:
     def __init__(self, share_folder, ip, port):
@@ -23,6 +24,7 @@ class Sender:
         for data in files:
             data["size"]  = os.path.getsize(data["path"])
             data["name"], data["type"] = os.path.splitext(data["name"])
+            data["type"] = data["type"][1:]
             data["date"] = time.strftime('%d/%m/%Y', time.localtime( os.path.getmtime(data["path"]) ))
 
         self.file_info = []
@@ -46,9 +48,19 @@ class Sender:
             print("FT Server is not responding ! Error: {}".format(e))
             return 0
         
-        self.server.send(b"HELLO")
+        try:
+            self.server.send(b"HELLO")
+        except socket.error as e:
+            print("FT Server is not listening ! Error: {}".format(e))
+            return 0
 
-        response = self.server.recv(4096).decode("utf-8").strip()
+
+        data_in = Helper.receive(self.server, 4096)
+        if(data_in is None):
+            print("FT Server is not responding ! Error: {}".format(e))
+            return 0
+        
+        response = data_in.decode("utf-8").strip()
 
         if(response != "HI"):
             print("FT Server is not responding correctly !")
@@ -60,15 +72,20 @@ class Sender:
 
         for file_ in self.file_info:
 
-            if(len(message > 0)):
+            if(len(message) > 0):
                 message += self.separator
             
             message += file_
             num += 1
             if(num == 5):
                 break
+
+        try:
+            self.server.send(message.encode())
+        except socket.error as e:
+            print("FT Server is not listening! Error: {}".format(e))
+            return 0        
         
-        self.server.send(message.encode())
         return 1
 
     def search(self, filename):
@@ -79,12 +96,18 @@ class Sender:
 
         message = "SEARCH: {}".format(filename)
         
-        self.server.send(message.encode())
-        
-        buffer = self.server.recv(4096).decode("utf-8")
-        
-        while "\0" not in buffer:
-            buffer += self.server.recv(4096).decode("utf-8")
+        try:
+            self.server.send(message.encode())
+        except socket.error as e:
+            print("Server is not listening! Error: {}".format(e))
+            return 0, "Server is not listening!"
+
+
+        buffer = Helper.receive(self.server, 8192)
+        if(buffer is None):
+            return 0, "Server is not responding! Maybe you're greedy!"
+
+        buffer = buffer.decode("utf-8")
         
         
         if(buffer == "NOT FOUND"):
@@ -106,19 +129,13 @@ class Sender:
     def close(self):
         if self.server == None:
             return
-        self.server.send(b"BYE")
+        try:
+            self.server.send(b"BYE")
+        except socket.error as e:
+            print("Server is not listening! Error {}".format(e))
+        print('BYE!')
         self.server.close()
-        
-        
 
-
-
-
-
-        
-
-
-        
 
 if __name__ == "__main__":
-    sender = Sender("../Files", "0.0.0.0", 1232)
+    sender = Sender("../Files", "127.0.0.1", 2558)
